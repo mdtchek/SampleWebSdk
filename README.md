@@ -1,16 +1,17 @@
 # Tchek SSO/WEB_SDK
-Hi! Welcome to Tchek Documentation
+Hi! Welcome to Tchek Web SDK Documentation.
 
-The **Tchek WEB SDK** is a web alternative to the native mobile application (iOS/Android).
+Our WebApp includes a number of modules that are available as widgets that can be easily integrated into an iframe. These widgets allow developers to access the full range of features and functionality provided by the ALTO AI platform.
+To use these widgets, you will need to generate a temporary permission token. This token will allow you to access the widget for a specified period of time, after which the token will expire and you will need to generate a new one. 
 
 *_Supported languages: `FR`|`EN`|`DE`_
 
-## How It's work ?
-There two ways to access to the app :
-- by `/auth/login` global route
-- by `/sso/intro-shoot-inspect?token=<TXXXXXX>` with your unique temporary access token
+## How Does It Work ?
+There are two ways to access to the web app :
+- by `/auth/login` global route (to access the Tchek Hub)
+- by `https://webapp.tchek.fr/[language]/services/TXXXXXX/[FEAT]` route with your unique temporary access token to access the shoot-inspect or Fast Track. 
 
-With the temporary access token, you will be automatically redirected to the first page you access with it.
+With the temporary access token, you will be automatically redirected to the first page you have access to, depending on the inspection progress.
 Access to features are customizable per token :
 
 |FEAT				|LOGIN							|SSO							|
@@ -21,7 +22,7 @@ Access to features are customizable per token :
 
 <img src="https://github.githubassets.com/images/icons/emoji/unicode/2139.png" alt="drawing" width="15"/> It's recommended to use the SDK in an iframe
 
-## Generate SSO
+## Generate SSO token
 
 Get your unique temporary token by using the following request
 ````
@@ -29,9 +30,8 @@ curl --location --request POST 'https://alto.tchek.fr/apiV1/tokenmanager/token' 
 --header 'X-API-Key: <PERSONAL_API_TOKEN>' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "deviceId" : <uuid()>, // optional: unique id from uuid() library or from mobile device id (IDFA for iOS or AAID for Android)
     "validity" : ∞, // in days
-    "tchekId" : "xXxXXxXXxx", // empty if new trade in
+    "tchekId" : "xXxXXxXXxx", // empty if new self inspection token
     "options" : {
         "shootInspect" : true,
         "fastTrack" : true,
@@ -40,17 +40,17 @@ curl --location --request POST 'https://alto.tchek.fr/apiV1/tokenmanager/token' 
         "downloadRoi" : false
     },
     "tradeIn" : {
-        "tradeinVehicle" : true, // optional if not using dashboard
-        "immat" : "DJ624RS", // optional if not using dashboard
-        "sendingType" : 0 // optional if not using dashboard (0: Email | 1: SMS)
+        "tradeinVehicle" : true, // optional if not using the Hub, but recommended. 
+        "immat" : "DJ624RS", // optional if not using the Hub
+        "sendingType" : 0 // optional if not using using the Hub: send an automated message with self-inspection link (0: Email | 1: SMS, | 2: Email + SMS, | null: no message sent). Requires setup from Tchek.
     },
     "customer" : {
 	"clientType": "customer",
 	"email": "john.doe@company.io",
 	"firstname": "john",
-	"gender":  "male",
+	"gender":  null,
 	"lastname":  "doe",
-	"phone":  "0601020304"
+	"phone":  "0033601020304"
     }
 }'
 ````
@@ -65,7 +65,7 @@ curl --location --request POST 'https://alto.tchek.fr/apiV1/tokenmanager/token' 
 ````
 
 ## Generate Report Url
-For access to a specific web report, set the tchekId in request and use the `uid` object from response for build url
+To access to a specific web report for an inspection, set the tchekId in request and use the `uid` object from response to build the url
 ````
 https://webapp.tchek.ai/<lang>/report?token=T010203
 ````
@@ -77,7 +77,7 @@ Install modules
 npm install
 ````
 
-Run demo after replaced `<TXXXXXX>` with your personal sso token in `/index.html`
+Run demo after replacing `<TXXXXXX>` with your personal sso token uid in `/index.html`
 ````
 npm run start
 ````
